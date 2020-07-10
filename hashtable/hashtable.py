@@ -103,7 +103,7 @@ class HashTable:
         """
         # Your code here
         index = self.hash_index(key)
-        self.storage.pop(index)
+        self.storage[index] = HashTableEntry(key, None)
         self.size -= 1
 
     def get(self, key):
