@@ -48,6 +48,8 @@ class HashTable:
         # Your code here
         # laod factor is the number of keys stored in the hashtable divided by the capacity. The size should be less than 1 in general to maintain O(1) look up. Deciding factor on when to increase capacity
         load_factor = self.size/self.capacity
+        # print("load_factor", load_factor)
+        return load_factor
 
     def fnv1(self, key):
         """
@@ -105,6 +107,9 @@ class HashTable:
             else:
                 prev.next = HashTableEntry(key, value)
 
+        if self.get_load_factor() >= 0.7:
+            self.resize(self.capacity*2)
+
     def delete(self, key):
         """
         Remove the value stored with the given key.
@@ -114,9 +119,41 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        # index = self.hash_index(key)
+        # self.storage[index] = HashTableEntry(key, None)
+        # self.size -= 1
+
         index = self.hash_index(key)
-        self.storage[index] = HashTableEntry(key, None)
-        self.size -= 1
+        entry = self.storage[index]
+        is_found = False
+
+        if not entry:
+            is_found = False
+
+        # while entry.next:
+        #     prev = entry
+        #     entry = entry.next
+        #     if prev.key == key:
+        #         self.storage[index] = prev.next
+        #         self.size -= 1
+        #         break
+        #     if entry.key == key:
+        #         prev.next = entry.next
+        #         self.size -= 1
+        #         break
+        #     f"WARNING!!: {key} does not exist"
+        while entry:
+            if entry.key == key:
+                entry.value = None
+                is_found = True
+                break
+            entry = entry.next
+        if is_found:
+            self.size -= 1
+            if self.get_load_factor() <= 0.2:
+                self.resize(self.capacity//2)
+        else:
+            return f"WARNING!!: {key} does not exist"
 
     def get(self, key):
         """
@@ -127,9 +164,20 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        # index = self.hash_index(key)
+        # value = self.storage[index].value
+        # return value
+
         index = self.hash_index(key)
-        value = self.storage[index].value
-        return value
+        entry = self.storage[index]
+        # print("entry", entry.key)
+
+        while entry:
+            if entry.key == key:
+                return entry.value
+            entry = entry.next
+
+        return None
 
     def resize(self, new_capacity):
         """
@@ -138,7 +186,14 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        new_ht = HashTable(new_capacity)
+        for item in self.storage:
+            while item is not None:
+                if item.value:
+                    new_ht.put(item.key, item.value)
+                item = item.next
+        self.capacity = new_ht.capacity
+        self.storage = new_ht.storage
 
 
 if __name__ == "__main__":
