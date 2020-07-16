@@ -85,13 +85,25 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
-        index = self.hash_index(key)
+        # index = self.hash_index(key)
 
-        node = HashTableEntry(key=key, value=value)
-        self.storage[index] = node
-        print("node put", node.key, node.value)
+        # node = HashTableEntry(key=key, value=value)
+        # self.storage[index] = node
+        # print("node put", node.key, node.value)
+        # self.size += 1
+
         self.size += 1
+        index = self.hash_index(key)
+        entry = self.storage[index]
+        if not entry:
+            self.storage[index] = HashTableEntry(key, value)
+        else:
+            while entry and entry.key != key:
+                prev, entry = entry, entry.next
+            if entry.key == key:
+                entry.value = value
+            else:
+                prev.next = HashTableEntry(key, value)
 
     def delete(self, key):
         """
